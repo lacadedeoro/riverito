@@ -1,10 +1,23 @@
 const { ethers } = require('ethers');
-const axios = require('axios');
 
-class AdvancedTradingEngine {
-    constructor(provider, config) {
+// 🚀 OPUS 4.1: ULTRA-FAST TRADING ENGINE - MAXIMUM SPEED IMPLEMENTATION
+// This is the fastest possible trading engine with zero delays and maximum speed
+class OPUSUltraFastTradingEngine {
+    constructor(provider, config = {}) {
         this.provider = provider;
-        this.config = config;
+        
+        // OPUS 4.1: Ultra-aggressive configuration for maximum speed
+        this.config = {
+            gasPrice: config.gasPrice || '10000', // 10000 gwei for maximum priority
+            gasLimit: config.gasLimit || 15000000, // 15M gas limit for complex transactions
+            priorityFee: config.priorityFee || '5000', // 5000 gwei priority fee
+            maxSlippage: config.maxSlippage || 200, // 200% slippage for ultra-speed
+            instantExecution: true, // Always true for ultra-speed
+            skipValidation: true, // Skip all validation for speed
+            zeroDelayMode: true, // Zero delay mode
+            preApprovedMode: true, // Pre-approved mode
+            ...config
+        };
         
         // Worldchain DEX addresses
         this.UNISWAP_V3_ROUTER = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
@@ -14,7 +27,7 @@ class AdvancedTradingEngine {
         // WLD token on Worldchain
         this.WLD_ADDRESS = '0x2cfc85d8e48f8eab294be644d9e25c3030863003';
         
-        // ABI definitions - OPUS 4.1: Ultra-optimized for speed
+        // OPUS 4.1: Ultra-optimized ABIs for maximum speed
         this.ROUTER_ABI = [
             'function exactInputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96)) external returns (uint256 amountOut)',
             'function exactOutputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountOut, uint256 amountInMaximum, uint160 sqrtPriceLimitX96)) external returns (uint256 amountIn)'
@@ -35,21 +48,24 @@ class AdvancedTradingEngine {
             'function transfer(address to, uint256 amount) returns (bool)'
         ];
         
-        // Initialize contracts - OPUS 4.1: Pre-initialized for maximum speed
+        // OPUS 4.1: Pre-initialized contracts for zero-delay execution
         this.routerContract = new ethers.Contract(this.UNISWAP_V3_ROUTER, this.ROUTER_ABI, this.provider);
         this.quoterContract = new ethers.Contract(this.QUOTER_V2, this.QUOTER_ABI, this.provider);
         
         // OPUS 4.1: Ultra-fast fee tier (0.3% only for maximum speed)
         this.FASTEST_FEE = 3000;
         
-        // OPUS 4.1: Ultra-fast price cache with zero delays
-        this.priceCache = new Map();
-        this.lastPriceUpdate = new Map();
-        
         // OPUS 4.1: Ultra-high gas settings for maximum priority
-        this.ULTRA_FAST_GAS_PRICE = ethers.parseUnits('1000', 'gwei'); // Ultra-high priority (increased from 500)
-        this.ULTRA_FAST_GAS_LIMIT = 3000000; // High gas limit for complex transactions (increased from 2000000)
-        this.ULTRA_FAST_PRIORITY_FEE = ethers.parseUnits('500', 'gwei'); // Maximum priority fee (increased from 300)
+        this.ULTRA_FAST_GAS_PRICE = ethers.parseUnits(this.config.gasPrice, 'gwei');
+        this.ULTRA_FAST_GAS_LIMIT = this.config.gasLimit;
+        this.ULTRA_FAST_PRIORITY_FEE = ethers.parseUnits(this.config.priorityFee, 'gwei');
+        
+        // OPUS 4.1: Pre-allocated memory pools for zero allocation delays
+        this.memoryPool = {
+            priceData: new Array(1000).fill(null),
+            swapParams: new Array(1000).fill(null),
+            executionResults: new Array(1000).fill(null)
+        };
         
         // OPUS 4.1: Pre-allocated wallet cache for zero-delay execution
         this.walletCache = new Map();
@@ -58,6 +74,13 @@ class AdvancedTradingEngine {
         // OPUS 4.1: Parallel execution pool
         this.executionPool = [];
         this.isExecuting = false;
+        
+        console.log('🚀 OPUS 4.1 ULTRA-FAST TRADING ENGINE INITIALIZED');
+        console.log(`⚡ Gas price: ${this.config.gasPrice} gwei (MAXIMUM-PRIORITY)`);
+        console.log(`🔥 Gas limit: ${this.config.gasLimit} (MAXIMUM-CAPACITY)`);
+        console.log(`💨 Priority fee: ${this.config.priorityFee} gwei (MAXIMUM-PRIORITY)`);
+        console.log(`🚀 Zero delay mode: ${this.config.zeroDelayMode}`);
+        console.log(`⚡ Pre-approved mode: ${this.config.preApprovedMode}`);
     }
 
     // OPUS 4.1: Ultra-fast price fetching with zero delays and no cache
@@ -259,6 +282,39 @@ class AdvancedTradingEngine {
         }
     }
 
+    // OPUS 4.1: INSTANT DIP buying with maximum speed and zero delays
+    async executeInstantDIPBuy(wallet, tokenAddress, amountInWLD) {
+        const startTime = Date.now();
+        
+        try {
+            console.log(`🚀 OPUS 4.1: Executing INSTANT DIP buy for ${tokenAddress}`);
+            console.log(`⚡ Bypassing all monitoring delays for maximum speed`);
+            
+            // OPUS 4.1: Execute ultra-fast DIP buy immediately
+            const result = await this.executeUltraFastDIPBuy(wallet, tokenAddress, amountInWLD, 100);
+            
+            const totalTime = Date.now() - startTime;
+            
+            console.log(`🎯 OPUS 4.1 INSTANT DIP EXECUTED in ${totalTime}ms`);
+            console.log(`🚀 OPUS 4.1 Speed: ${totalTime < 100 ? 'INSTANT' : totalTime < 200 ? 'ULTRA-FAST' : 'FAST'}`);
+            
+            return {
+                ...result,
+                dipDetected: true,
+                totalTime,
+                opusSpeed: totalTime < 100 ? 'INSTANT' : totalTime < 200 ? 'ULTRA-FAST' : 'FAST'
+            };
+            
+        } catch (error) {
+            const totalTime = Date.now() - startTime;
+            return {
+                success: false,
+                error: error.message,
+                totalTime
+            };
+        }
+    }
+
     // OPUS 4.1: Batch ultra-fast DIP buying with zero delays
     async executeBatchUltraFastDIPBuys(trades) {
         const startTime = Date.now();
@@ -294,7 +350,7 @@ class AdvancedTradingEngine {
     }
 
     // OPUS 4.1: Ultra-fast price monitoring for DIP detection with zero delays
-    async monitorPricesForDIP(tokenAddresses, callback, interval = 50) { // 50ms for ultra-speed (reduced from 100)
+    async monitorPricesForDIP(tokenAddresses, callback, interval = 10) { // 10ms for ultra-speed
         const priceCache = new Map();
         
         const monitor = async () => {
@@ -398,41 +454,8 @@ class AdvancedTradingEngine {
         }
     }
 
-    // OPUS 4.1: Instant DIP execution - bypasses all monitoring for maximum speed
-    async executeInstantDIP(wallet, tokenAddress, amountInWLD) {
-        const startTime = Date.now();
-        
-        try {
-            console.log(`🚀 OPUS 4.1: Executing INSTANT DIP buy for ${tokenAddress}`);
-            console.log(`⚡ Bypassing all monitoring delays for maximum speed`);
-            
-            // OPUS 4.1: Execute ultra-fast DIP buy immediately
-            const result = await this.executeUltraFastDIPBuy(wallet, tokenAddress, amountInWLD, 50);
-            
-            const totalTime = Date.now() - startTime;
-            
-            console.log(`🎯 OPUS 4.1 INSTANT DIP EXECUTED in ${totalTime}ms`);
-            console.log(`🚀 OPUS 4.1 Speed: ${totalTime < 100 ? 'INSTANT' : totalTime < 200 ? 'ULTRA-FAST' : 'FAST'}`);
-            
-            return {
-                ...result,
-                dipDetected: true,
-                totalTime,
-                opusSpeed: totalTime < 100 ? 'INSTANT' : totalTime < 200 ? 'ULTRA-FAST' : 'FAST'
-            };
-            
-        } catch (error) {
-            const totalTime = Date.now() - startTime;
-            return {
-                success: false,
-                error: error.message,
-                totalTime
-            };
-        }
-    }
-
     // OPUS 4.1: Ultra-fast continuous DIP monitoring and execution with zero delays
-    async startUltraFastDIPBot(wallet, tokenAddress, amountInWLD, dipThreshold = 1, interval = 25) { // 25ms for ultra-speed (reduced from 50)
+    async startUltraFastDIPBot(wallet, tokenAddress, amountInWLD, dipThreshold = 1, interval = 5) { // 5ms for ultra-speed
         console.log(`🚀 Starting OPUS 4.1 Ultra-Fast DIP Bot for ${tokenAddress}`);
         console.log(`⚡ Monitoring every ${interval}ms with ${dipThreshold}% dip threshold`);
         console.log(`🔥 Ultra-fast execution with ${ethers.formatUnits(this.ULTRA_FAST_GAS_PRICE, 'gwei')} gwei gas price`);
@@ -451,58 +474,6 @@ class AdvancedTradingEngine {
                 
             } catch (error) {
                 console.error('OPUS 4.1 DIP Bot error:', error.message);
-            }
-        };
-        
-        // OPUS 4.1: Execute immediately and set interval
-        await monitor();
-        const intervalId = setInterval(monitor, interval);
-        
-        return () => clearInterval(intervalId);
-    }
-
-    // OPUS 4.1: Ultra-fast price monitoring with zero delays
-    async monitorPriceChanges(tokenAddresses, callback, interval = 50) { // 50ms for ultra-speed (reduced from 200)
-        const monitor = async () => {
-            try {
-                // OPUS 4.1: Get all prices in parallel
-                const pricePromises = tokenAddresses.map(async (address) => {
-                    try {
-                        const price = await this.getTokenPrice(address);
-                        return { address, price: price.price };
-                    } catch (error) {
-                        return { address, error: error.message };
-                    }
-                });
-                
-                const prices = await Promise.all(pricePromises);
-                
-                // OPUS 4.1: Process prices immediately
-                for (const priceData of prices) {
-                    if (priceData.price) {
-                        const cacheKey = `monitor_${priceData.address}`;
-                        const lastPrice = this.priceCache.get(cacheKey);
-                        
-                        if (lastPrice && lastPrice.price) {
-                            const priceChange = ((priceData.price - lastPrice.price) / lastPrice.price) * 100;
-                            
-                            if (Math.abs(priceChange) > 0.5) { // 0.5% change threshold for ultra-speed
-                                callback({
-                                    tokenAddress: priceData.address,
-                                    oldPrice: lastPrice.price,
-                                    newPrice: priceData.price,
-                                    change: priceChange,
-                                    timestamp: Date.now()
-                                });
-                            }
-                        }
-                        
-                        this.priceCache.set(cacheKey, priceData);
-                    }
-                }
-                
-            } catch (error) {
-                console.error('OPUS 4.1 Price monitoring error:', error.message);
             }
         };
         
@@ -734,6 +705,18 @@ class AdvancedTradingEngine {
             newestEntry: Math.max(...Array.from(this.lastPriceUpdate.values()))
         };
     }
+
+    // OPUS 4.1: Get engine status
+    getStatus() {
+        return {
+            opusVersion: '4.1 ULTRA-FAST',
+            gasPrice: ethers.formatUnits(this.ULTRA_FAST_GAS_PRICE, 'gwei'),
+            gasLimit: this.ULTRA_FAST_GAS_LIMIT,
+            priorityFee: ethers.formatUnits(this.ULTRA_FAST_PRIORITY_FEE, 'gwei'),
+            fastestFee: this.FASTEST_FEE,
+            config: this.config
+        };
+    }
 }
 
-module.exports = AdvancedTradingEngine;
+module.exports = OPUSUltraFastTradingEngine;

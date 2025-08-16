@@ -1,158 +1,49 @@
-const fs = require('fs');
-const path = require('path');
+const { ethers } = require('ethers');
 const EventEmitter = require('events');
 
-// OPUS 4.1: Ultra-fast Machine Learning Components
-class UltraFastLinearRegression {
-    constructor() {
-        this.slope = 0;
-        this.intercept = 0;
-        this.trained = false;
-    }
-    
-    train(xData, yData) {
-        if (xData.length !== yData.length || xData.length < 2) {
-            throw new Error('Invalid training data');
-        }
-        
-        const n = xData.length;
-        const sumX = xData.reduce((a, b) => a + b, 0);
-        const sumY = yData.reduce((a, b) => a + b, 0);
-        const sumXY = xData.reduce((sum, x, i) => sum + x * yData[i], 0);
-        const sumXX = xData.reduce((sum, x) => sum + x * x, 0);
-        
-        this.slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-        this.intercept = (sumY - this.slope * sumX) / n;
-        this.trained = true;
-    }
-    
-    predict(x) {
-        if (!this.trained) {
-            throw new Error('Model not trained');
-        }
-        return this.slope * x + this.intercept;
-    }
-}
-
-class UltraFastMovingAveragePredictor {
-    constructor(window = 5) { // Reduced window for ultra-speed
-        this.window = window;
-        this.values = [];
-    }
-    
-    addValue(value) {
-        this.values.push(value);
-        if (this.values.length > this.window) {
-            this.values.shift();
-        }
-    }
-    
-    predict() {
-        if (this.values.length === 0) return 0;
-        return this.values.reduce((a, b) => a + b, 0) / this.values.length;
-    }
-    
-    getTrend() {
-        if (this.values.length < 2) return 0;
-        const recent = this.values.slice(-Math.min(3, this.values.length)); // Reduced for speed
-        const older = this.values.slice(0, Math.min(3, this.values.length));
-        
-        const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
-        const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
-        
-        return (recentAvg - olderAvg) / olderAvg * 100;
-    }
-}
-
-class UltraFastPatternRecognition {
-    constructor() {
-        this.patterns = {
-            bullish: [],
-            bearish: [],
-            neutral: []
-        };
-    }
-    
-    addPattern(priceSequence, outcome) {
-        const pattern = {
-            sequence: [...priceSequence],
-            outcome: outcome,
-            timestamp: Date.now()
-        };
-        
-        this.patterns[outcome].push(pattern);
-        
-        // Keep only recent patterns (last 500 per type for speed)
-        if (this.patterns[outcome].length > 500) {
-            this.patterns[outcome] = this.patterns[outcome].slice(-500);
-        }
-    }
-    
-    recognizePattern(currentSequence) {
-        let bestMatch = { type: 'neutral', confidence: 0 };
-        
-        for (const [type, patterns] of Object.entries(this.patterns)) {
-            for (const pattern of patterns) {
-                const similarity = this.calculateSimilarity(currentSequence, pattern.sequence);
-                if (similarity > bestMatch.confidence) {
-                    bestMatch = { type, confidence: similarity };
-                }
-            }
-        }
-        
-        return bestMatch;
-    }
-    
-    calculateSimilarity(seq1, seq2) {
-        if (seq1.length !== seq2.length) return 0;
-        
-        const differences = seq1.map((val, i) => Math.abs(val - seq2[i]));
-        const avgDifference = differences.reduce((a, b) => a + b, 0) / differences.length;
-        const maxVal = Math.max(...seq1, ...seq2);
-        
-        return Math.max(0, 1 - (avgDifference / maxVal));
-    }
-}
-
-// OPUS 4.1: Ultra-fast DIP Strategy Implementation
+// 🚀 OPUS 4.1: ULTRA-FAST DIP STRATEGY - MAXIMUM SPEED IMPLEMENTATION
 class UltraFastDIPStrategy {
     constructor(tradingEngine, config = {}) {
         this.tradingEngine = tradingEngine;
+        
+        // OPUS 4.1: Ultra-aggressive configuration for maximum speed
         this.config = {
-            dipThreshold: config.dipThreshold || 3, // 3% dip threshold for ultra-speed
-            monitoringInterval: config.monitoringInterval || 250, // 250ms for ultra-speed
-            maxSlippage: config.maxSlippage || 30, // 30% slippage for ultra-speed
-            gasPrice: config.gasPrice || '200', // 200 gwei for ultra-priority
-            gasLimit: config.gasLimit || 1500000, // High gas limit
-            priorityFee: config.priorityFee || '100', // 100 gwei priority fee
+            dipThreshold: config.dipThreshold || 1, // 1% dip threshold for ultra-speed
+            monitoringInterval: config.monitoringInterval || 10, // 10ms for ultra-speed (reduced from 250ms)
+            maxSlippage: config.maxSlippage || 50, // 50% slippage for ultra-speed
+            gasPrice: config.gasPrice || '2000', // 2000 gwei for ultra-priority (increased from 200)
+            gasLimit: config.gasLimit || 5000000, // 5M gas limit for complex transactions
+            priorityFee: config.priorityFee || '1000', // 1000 gwei priority fee (increased from 100)
+            instantExecution: config.instantExecution !== false, // Always true for ultra-speed
+            skipValidation: config.skipValidation !== false, // Skip all validation for speed
+            parallelExecution: config.parallelExecution !== false, // Execute in parallel
             ...config
         };
         
         this.isRunning = false;
         this.monitoringTokens = new Set();
         this.priceHistory = new Map();
-        this.dipAlerts = new Map();
         this.executionStats = {
             totalExecutions: 0,
             successfulExecutions: 0,
             totalVolume: 0,
             averageExecutionTime: 0,
+            fastestExecution: Infinity,
+            slowestExecution: 0,
             lastExecution: null
         };
-        
-        // OPUS 4.1: Ultra-fast prediction models
-        this.pricePredictor = new UltraFastMovingAveragePredictor(5);
-        this.patternRecognizer = new UltraFastPatternRecognition();
-        this.linearRegression = new UltraFastLinearRegression();
         
         // OPUS 4.1: Event emitter for real-time updates
         this.events = new EventEmitter();
         
-        console.log('🚀 OPUS 4.1 Ultra-Fast DIP Strategy initialized');
-        console.log(`⚡ Monitoring interval: ${this.config.monitoringInterval}ms`);
-        console.log(`🔥 Dip threshold: ${this.config.dipThreshold}%`);
-        console.log(`💨 Max slippage: ${this.config.maxSlippage}%`);
-        console.log(`⛽ Gas price: ${this.config.gasPrice} gwei`);
+        console.log('🚀 OPUS 4.1 ULTRA-FAST DIP STRATEGY INITIALIZED');
+        console.log(`⚡ Monitoring interval: ${this.config.monitoringInterval}ms (ULTRA-SPEED)`);
+        console.log(`🔥 Dip threshold: ${this.config.dipThreshold}% (ULTRA-SENSITIVE)`);
+        console.log(`💨 Max slippage: ${this.config.maxSlippage}% (ULTRA-AGGRESSIVE)`);
+        console.log(`⛽ Gas price: ${this.config.gasPrice} gwei (ULTRA-PRIORITY)`);
+        console.log(`🚀 Instant execution: ${this.config.instantExecution}`);
+        console.log(`⚡ Skip validation: ${this.config.skipValidation}`);
+        console.log(`🔄 Parallel execution: ${this.config.parallelExecution}`);
     }
 
     // OPUS 4.1: Ultra-fast DIP detection with zero delays
@@ -163,25 +54,25 @@ class UltraFastDIPStrategy {
             const priceHistory = this.priceHistory.get(tokenAddress) || [];
             const now = Date.now();
             
-            // OPUS 4.1: Add current price to history
+            // OPUS 4.1: Add current price to history (minimal processing)
             priceHistory.push({
                 price: currentPrice,
                 timestamp: now
             });
             
-            // OPUS 4.1: Keep only recent prices (last 10 for speed)
-            if (priceHistory.length > 10) {
-                priceHistory.splice(0, priceHistory.length - 10);
+            // OPUS 4.1: Keep only last 5 prices for ultra-speed
+            if (priceHistory.length > 5) {
+                priceHistory.splice(0, priceHistory.length - 5);
             }
             
             this.priceHistory.set(tokenAddress, priceHistory);
             
-            // OPUS 4.1: Calculate price change
+            // OPUS 4.1: Calculate price change (minimal threshold)
             if (priceHistory.length >= 2) {
                 const previousPrice = priceHistory[priceHistory.length - 2].price;
                 const priceChange = ((currentPrice - previousPrice) / previousPrice) * 100;
                 
-                // OPUS 4.1: Check for DIP
+                // OPUS 4.1: Check for DIP with ultra-sensitive threshold
                 if (priceChange <= -this.config.dipThreshold) {
                     const dipInfo = {
                         tokenAddress,
@@ -193,7 +84,7 @@ class UltraFastDIPStrategy {
                         detectionTime: Date.now() - startTime
                     };
                     
-                    console.log(`🚀 DIP DETECTED! ${tokenAddress}: ${priceChange.toFixed(2)}% drop`);
+                    console.log(`🚀 ULTRA-FAST DIP DETECTED! ${tokenAddress}: ${priceChange.toFixed(2)}% drop in ${dipInfo.detectionTime}ms`);
                     this.events.emit('dipDetected', dipInfo);
                     
                     return dipInfo;
@@ -203,7 +94,7 @@ class UltraFastDIPStrategy {
             return null;
             
         } catch (error) {
-            console.error('OPUS 4.1 DIP detection error:', error.message);
+            console.error('OPUS 4.1 Ultra-fast DIP detection error:', error.message);
             return null;
         }
     }
@@ -213,11 +104,12 @@ class UltraFastDIPStrategy {
         const startTime = Date.now();
         
         try {
-            console.log(`🎯 Executing OPUS 4.1 Ultra-Fast DIP Buy...`);
+            console.log(`🎯 Executing OPUS 4.1 ULTRA-FAST DIP Buy...`);
             console.log(`💰 Amount: ${amountInWLD} WLD`);
             console.log(`📉 Dip: ${dipInfo.dipPercentage.toFixed(2)}%`);
+            console.log(`⚡ Detection time: ${dipInfo.detectionTime}ms`);
             
-            // OPUS 4.1: Execute ultra-fast DIP buy
+            // OPUS 4.1: Execute ultra-fast DIP buy with maximum slippage
             const result = await this.tradingEngine.executeUltraFastDIPBuy(
                 wallet,
                 dipInfo.tokenAddress,
@@ -239,10 +131,19 @@ class UltraFastDIPStrategy {
                     executionTime
                 };
                 
-                console.log(`✅ DIP Buy Executed Successfully!`);
+                // OPUS 4.1: Track fastest/slowest execution times
+                if (executionTime < this.executionStats.fastestExecution) {
+                    this.executionStats.fastestExecution = executionTime;
+                }
+                if (executionTime > this.executionStats.slowestExecution) {
+                    this.executionStats.slowestExecution = executionTime;
+                }
+                
+                console.log(`✅ ULTRA-FAST DIP Buy Executed Successfully!`);
                 console.log(`⚡ Execution time: ${executionTime}ms`);
                 console.log(`🔥 Gas price: ${result.gasPrice} gwei`);
                 console.log(`📊 TX Hash: ${result.txHash}`);
+                console.log(`🚀 OPUS 4.1 Speed: ${result.opusSpeed || 'ULTRA-FAST'}`);
                 
                 this.events.emit('dipExecuted', {
                     ...result,
@@ -250,7 +151,7 @@ class UltraFastDIPStrategy {
                     executionTime
                 });
             } else {
-                console.log(`❌ DIP Buy Failed: ${result.error}`);
+                console.log(`❌ ULTRA-FAST DIP Buy Failed: ${result.error}`);
                 this.events.emit('dipFailed', {
                     ...result,
                     dipInfo,
@@ -267,7 +168,7 @@ class UltraFastDIPStrategy {
             
         } catch (error) {
             const executionTime = Date.now() - startTime;
-            console.error('OPUS 4.1 DIP execution error:', error.message);
+            console.error('OPUS 4.1 Ultra-fast DIP execution error:', error.message);
             
             this.events.emit('dipError', {
                 error: error.message,
@@ -283,16 +184,17 @@ class UltraFastDIPStrategy {
         }
     }
 
-    // OPUS 4.1: Ultra-fast continuous DIP monitoring
+    // OPUS 4.1: Ultra-fast continuous DIP monitoring with 10ms intervals
     async startDIPMonitoring(wallet, tokenAddresses, amountInWLD) {
         if (this.isRunning) {
-            console.log('⚠️ DIP monitoring is already running');
+            console.log('⚠️ Ultra-fast DIP monitoring is already running');
             return;
         }
         
-        console.log(`🚀 Starting OPUS 4.1 Ultra-Fast DIP Monitoring...`);
+        console.log(`🚀 Starting OPUS 4.1 ULTRA-FAST DIP Monitoring...`);
         console.log(`📊 Monitoring ${tokenAddresses.length} tokens`);
         console.log(`💰 Buy amount: ${amountInWLD} WLD per DIP`);
+        console.log(`⚡ Monitoring interval: ${this.config.monitoringInterval}ms (ULTRA-SPEED)`);
         
         this.isRunning = true;
         this.monitoringTokens = new Set(tokenAddresses);
@@ -301,7 +203,7 @@ class UltraFastDIPStrategy {
             if (!this.isRunning) return;
             
             try {
-                // OPUS 4.1: Get all prices in parallel
+                // OPUS 4.1: Get all prices in parallel with zero delays
                 const pricePromises = Array.from(this.monitoringTokens).map(async (tokenAddress) => {
                     try {
                         const priceData = await this.tradingEngine.getTokenPrice(tokenAddress);
@@ -313,24 +215,35 @@ class UltraFastDIPStrategy {
                 
                 const prices = await Promise.all(pricePromises);
                 
-                // OPUS 4.1: Process prices and detect DIPs
+                // OPUS 4.1: Process prices and detect DIPs immediately
+                const dipPromises = [];
+                
                 for (const priceData of prices) {
                     if (priceData.price && !priceData.error) {
                         const dipInfo = await this.detectDIP(priceData.tokenAddress, priceData.price);
                         
                         if (dipInfo) {
-                            // OPUS 4.1: Execute DIP buy immediately
-                            await this.executeDIPBuy(wallet, dipInfo, amountInWLD);
+                            // OPUS 4.1: Execute DIP buy immediately or in parallel
+                            if (this.config.parallelExecution) {
+                                dipPromises.push(this.executeDIPBuy(wallet, dipInfo, amountInWLD));
+                            } else {
+                                await this.executeDIPBuy(wallet, dipInfo, amountInWLD);
+                            }
                         }
                     }
                 }
                 
+                // OPUS 4.1: Wait for parallel executions if enabled
+                if (this.config.parallelExecution && dipPromises.length > 0) {
+                    await Promise.all(dipPromises);
+                }
+                
             } catch (error) {
-                console.error('OPUS 4.1 DIP monitoring error:', error.message);
+                console.error('OPUS 4.1 Ultra-fast DIP monitoring error:', error.message);
             }
         };
         
-        // OPUS 4.1: Execute immediately and set interval
+        // OPUS 4.1: Execute immediately and set ultra-fast interval
         await monitor();
         this.monitoringInterval = setInterval(monitor, this.config.monitoringInterval);
         
@@ -345,11 +258,11 @@ class UltraFastDIPStrategy {
     // OPUS 4.1: Stop DIP monitoring
     stopDIPMonitoring() {
         if (!this.isRunning) {
-            console.log('⚠️ DIP monitoring is not running');
+            console.log('⚠️ Ultra-fast DIP monitoring is not running');
             return;
         }
         
-        console.log('🛑 Stopping OPUS 4.1 DIP Monitoring...');
+        console.log('🛑 Stopping OPUS 4.1 Ultra-Fast DIP Monitoring...');
         
         this.isRunning = false;
         if (this.monitoringInterval) {
@@ -366,10 +279,10 @@ class UltraFastDIPStrategy {
     async executeBatchDIPBuys(wallet, dipInfos, amountInWLD) {
         const startTime = Date.now();
         
-        console.log(`🚀 Executing OPUS 4.1 Batch DIP Buys...`);
+        console.log(`🚀 Executing OPUS 4.1 ULTRA-FAST Batch DIP Buys...`);
         console.log(`📊 DIPs to execute: ${dipInfos.length}`);
         
-        // OPUS 4.1: Execute all DIP buys in parallel
+        // OPUS 4.1: Execute all DIP buys in parallel for maximum speed
         const executionPromises = dipInfos.map(dipInfo => 
             this.executeDIPBuy(wallet, dipInfo, amountInWLD)
         );
@@ -379,7 +292,7 @@ class UltraFastDIPStrategy {
         
         const successCount = results.filter(r => r.success).length;
         
-        console.log(`✅ Batch DIP execution completed`);
+        console.log(`✅ ULTRA-FAST Batch DIP execution completed`);
         console.log(`📊 Success: ${successCount}/${dipInfos.length}`);
         console.log(`⚡ Total time: ${totalTime}ms`);
         console.log(`⚡ Average time: ${totalTime / dipInfos.length}ms`);
@@ -399,103 +312,68 @@ class UltraFastDIPStrategy {
             successRate: this.executionStats.totalExecutions > 0 ? 
                 (this.executionStats.successfulExecutions / this.executionStats.totalExecutions) * 100 : 0,
             isRunning: this.isRunning,
-            monitoringTokens: Array.from(this.monitoringTokens)
+            monitoringTokens: Array.from(this.monitoringTokens),
+            config: this.config
         };
-    }
-
-    // OPUS 4.1: Ultra-fast price prediction
-    async predictPrice(tokenAddress) {
-        try {
-            const priceHistory = this.priceHistory.get(tokenAddress);
-            if (!priceHistory || priceHistory.length < 3) {
-                return null;
-            }
-            
-            const prices = priceHistory.map(p => p.price);
-            
-            // OPUS 4.1: Update prediction models
-            this.pricePredictor.values = prices.slice(-5);
-            
-            // OPUS 4.1: Get predictions
-            const movingAveragePrediction = this.pricePredictor.predict();
-            const trend = this.pricePredictor.getTrend();
-            
-            // OPUS 4.1: Pattern recognition
-            const pattern = this.patternRecognizer.recognizePattern(prices.slice(-5));
-            
-            return {
-                currentPrice: prices[prices.length - 1],
-                movingAveragePrediction,
-                trend,
-                pattern: pattern.type,
-                confidence: pattern.confidence,
-                timestamp: Date.now()
-            };
-            
-        } catch (error) {
-            console.error('OPUS 4.1 Price prediction error:', error.message);
-            return null;
-        }
     }
 
     // OPUS 4.1: Add token to monitoring
     addTokenToMonitoring(tokenAddress) {
         this.monitoringTokens.add(tokenAddress);
-        console.log(`📊 Added ${tokenAddress} to DIP monitoring`);
+        console.log(`📊 Added ${tokenAddress} to ultra-fast DIP monitoring`);
         this.events.emit('tokenAdded', tokenAddress);
     }
 
     // OPUS 4.1: Remove token from monitoring
     removeTokenFromMonitoring(tokenAddress) {
         this.monitoringTokens.delete(tokenAddress);
-        console.log(`📊 Removed ${tokenAddress} from DIP monitoring`);
+        console.log(`📊 Removed ${tokenAddress} from ultra-fast DIP monitoring`);
         this.events.emit('tokenRemoved', tokenAddress);
     }
 
     // OPUS 4.1: Update configuration
     updateConfig(newConfig) {
         this.config = { ...this.config, ...newConfig };
-        console.log('⚙️ OPUS 4.1 DIP Strategy configuration updated');
+        console.log('⚙️ OPUS 4.1 Ultra-Fast DIP Strategy configuration updated');
         this.events.emit('configUpdated', this.config);
     }
 
-    // OPUS 4.1: Save strategy state
-    saveState(filePath = 'dip-strategy-state.json') {
+    // OPUS 4.1: Instant DIP execution (bypasses all monitoring)
+    async executeInstantDIP(wallet, tokenAddress, amountInWLD) {
+        const startTime = Date.now();
+        
         try {
-            const state = {
-                config: this.config,
-                executionStats: this.executionStats,
-                priceHistory: Object.fromEntries(this.priceHistory),
-                monitoringTokens: Array.from(this.monitoringTokens),
-                timestamp: Date.now()
+            console.log(`🚀 OPUS 4.1: Executing INSTANT DIP buy for ${tokenAddress}`);
+            console.log(`⚡ Bypassing all monitoring delays for maximum speed`);
+            
+            // OPUS 4.1: Execute ultra-fast DIP buy immediately
+            const result = await this.tradingEngine.executeUltraFastDIPBuy(
+                wallet,
+                tokenAddress,
+                amountInWLD,
+                this.config.maxSlippage
+            );
+            
+            const totalTime = Date.now() - startTime;
+            
+            console.log(`🎯 OPUS 4.1 INSTANT DIP EXECUTED in ${totalTime}ms`);
+            console.log(`🚀 OPUS 4.1 Speed: ${totalTime < 50 ? 'INSTANT' : totalTime < 100 ? 'ULTRA-FAST' : 'FAST'}`);
+            
+            return {
+                ...result,
+                dipDetected: true,
+                totalTime,
+                opusSpeed: totalTime < 50 ? 'INSTANT' : totalTime < 100 ? 'ULTRA-FAST' : 'FAST'
             };
             
-            fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
-            console.log(`💾 OPUS 4.1 DIP Strategy state saved to ${filePath}`);
-            
         } catch (error) {
-            console.error('OPUS 4.1 Save state error:', error.message);
+            const totalTime = Date.now() - startTime;
+            return {
+                success: false,
+                error: error.message,
+                totalTime
+            };
         }
-    }
-
-    // OPUS 4.1: Load strategy state
-    loadState(filePath = 'dip-strategy-state.json') {
-        try {
-            if (fs.existsSync(filePath)) {
-                const state = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                
-                this.config = { ...this.config, ...state.config };
-                this.executionStats = state.executionStats;
-                this.priceHistory = new Map(Object.entries(state.priceHistory || {}));
-                this.monitoringTokens = new Set(state.monitoringTokens || []);
-                
-                console.log(`📂 OPUS 4.1 DIP Strategy state loaded from ${filePath}`);
-                return true;
-            }
-        } catch (error) {
-            console.error('OPUS 4.1 Load state error:', error.message);
-        }
-        return false;
     }
 }
 
@@ -507,15 +385,15 @@ class UltraFastStrategyManager {
         this.activeStrategies = new Set();
         this.events = new EventEmitter();
         
-        console.log('🚀 OPUS 4.1 Ultra-Fast Strategy Manager initialized');
+        console.log('🚀 OPUS 4.1 ULTRA-FAST STRATEGY MANAGER INITIALIZED');
     }
 
-    // OPUS 4.1: Create DIP strategy
-    createDIPStrategy(strategyId, config = {}) {
+    // OPUS 4.1: Create ultra-fast DIP strategy
+    createUltraFastDIPStrategy(strategyId, config = {}) {
         const strategy = new UltraFastDIPStrategy(this.tradingEngine, config);
         this.strategies.set(strategyId, strategy);
         
-        console.log(`📊 Created OPUS 4.1 DIP Strategy: ${strategyId}`);
+        console.log(`📊 Created OPUS 4.1 Ultra-Fast DIP Strategy: ${strategyId}`);
         return strategy;
     }
 
@@ -524,17 +402,17 @@ class UltraFastStrategyManager {
         return this.strategies.get(strategyId);
     }
 
-    // OPUS 4.1: Start strategy
-    async startStrategy(strategyId, wallet, tokenAddresses, amountInWLD) {
+    // OPUS 4.1: Start ultra-fast strategy
+    async startUltraFastStrategy(strategyId, wallet, tokenAddresses, amountInWLD) {
         const strategy = this.getStrategy(strategyId);
         if (!strategy) {
-            throw new Error(`Strategy ${strategyId} not found`);
+            throw new Error(`Ultra-fast strategy ${strategyId} not found`);
         }
         
         await strategy.startDIPMonitoring(wallet, tokenAddresses, amountInWLD);
         this.activeStrategies.add(strategyId);
         
-        console.log(`🚀 Started OPUS 4.1 Strategy: ${strategyId}`);
+        console.log(`🚀 Started OPUS 4.1 Ultra-Fast Strategy: ${strategyId}`);
         this.events.emit('strategyStarted', strategyId);
     }
 
@@ -548,7 +426,7 @@ class UltraFastStrategyManager {
         strategy.stopDIPMonitoring();
         this.activeStrategies.delete(strategyId);
         
-        console.log(`🛑 Stopped OPUS 4.1 Strategy: ${strategyId}`);
+        console.log(`🛑 Stopped OPUS 4.1 Ultra-Fast Strategy: ${strategyId}`);
         this.events.emit('strategyStopped', strategyId);
     }
 
@@ -558,7 +436,7 @@ class UltraFastStrategyManager {
         
         for (const [strategyId, strategy] of this.strategies) {
             status[strategyId] = {
-                type: 'DIP',
+                type: 'Ultra-Fast DIP',
                 isActive: this.activeStrategies.has(strategyId),
                 stats: strategy.getExecutionStats(),
                 config: strategy.config
@@ -570,20 +448,17 @@ class UltraFastStrategyManager {
 
     // OPUS 4.1: Stop all strategies
     stopAllStrategies() {
-        console.log('🛑 Stopping all OPUS 4.1 strategies...');
+        console.log('🛑 Stopping all OPUS 4.1 ultra-fast strategies...');
         
         for (const strategyId of this.activeStrategies) {
             this.stopStrategy(strategyId);
         }
         
-        console.log('✅ All strategies stopped');
+        console.log('✅ All ultra-fast strategies stopped');
     }
 }
 
 module.exports = {
     UltraFastDIPStrategy,
-    UltraFastStrategyManager,
-    UltraFastLinearRegression,
-    UltraFastMovingAveragePredictor,
-    UltraFastPatternRecognition
+    UltraFastStrategyManager
 };
